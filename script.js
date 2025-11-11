@@ -1,32 +1,20 @@
-// Works with your existing HTML/CSS:
-// - Six divs with ids: drag1..drag6, each has background-image in CSS
-// - No <img> tags used; swap background-image between divs
+// Drag-and-drop that swaps the entire tiles (DOM nodes), not just images.
+// Works with your existing HTML/CSS (ids drag1..drag6, class "image").
 
 const tiles = document.querySelectorAll('#parent .image');
+const parent = document.getElementById('parent');
 
-// Track the source being dragged
 let dragSourceId = null;
-
-// Helpers to read/set background-image reliably
-function getBg(el) {
-  // Returns values like: url("...") or none
-  return getComputedStyle(el).backgroundImage;
-}
-
-function setBg(el, value) {
-  el.style.backgroundImage = value;
-}
 
 tiles.forEach(tile => {
   tile.addEventListener('dragstart', (e) => {
     dragSourceId = e.currentTarget.id;
     e.currentTarget.classList.add('selected');
 
-    // Provide data for HTML5 DnD and test frameworks
     if (e.dataTransfer) {
+      // identify the source element by id for the drop handler
       e.dataTransfer.setData('text/plain', dragSourceId);
-      // Optional: customize drag image if desired
-      // e.dataTransfer.setDragImage(e.currentTarget, 10, 10);
+      // optionally: e.dataTransfer.effectAllowed = 'move';
     }
   });
 
@@ -36,9 +24,10 @@ tiles.forEach(tile => {
     dragSourceId = null;
   });
 
-  // Must prevent default to allow dropping per spec
+  // Required so drop will fire
   tile.addEventListener('dragover', (e) => {
     e.preventDefault();
+    // optionally: e.dataTransfer.dropEffect = 'move';
   });
 
   tile.addEventListener('dragenter', (e) => {
@@ -55,20 +44,31 @@ tiles.forEach(tile => {
     e.preventDefault();
 
     const target = e.currentTarget;
-
-    // Retrieve the source id stored during dragstart
     const sourceId = (e.dataTransfer && e.dataTransfer.getData('text/plain')) || dragSourceId;
     if (!sourceId || sourceId === target.id) return;
 
     const sourceEl = document.getElementById(sourceId);
-    if (!sourceEl) return;
+    if (!sourceEl || !sourceEl.parentNode || !target.parentNode) return;
 
-    // Swap background images
-    const srcBg = getBg(sourceEl);
-    const tgtBg = getBg(target);
+    // Swap the two nodes in the DOM
+    // Technique: insert a temporary placeholder, then move nodes around it.
+    const placeholder = document.createElement('div');
+    placeholder.style.display = 'none';
 
-    setBg(sourceEl, tgtBg);
-    setBg(target, srcBg);
+    const sourceParent = sourceEl.parentNode;
+    const targetParent = target.parentNode;
+
+    // Insert placeholder where the source is
+    sourceParent.insertBefore(placeholder, sourceEl);
+
+    // Move source to target's position
+    targetParent.insertBefore(sourceEl, target);
+
+    // Move target to placeholder's original position
+    sourceParent.insertBefore(target, placeholder);
+
+    // Remove placeholder
+    placeholder.remove();
 
     // Cleanup styles
     sourceEl.classList.remove('selected');
