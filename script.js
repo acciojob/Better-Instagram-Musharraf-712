@@ -12,6 +12,7 @@ function getBg(el) {
   // Returns values like: url("...") or none
   return getComputedStyle(el).backgroundImage;
 }
+
 function setBg(el, value) {
   el.style.backgroundImage = value;
 }
@@ -24,7 +25,8 @@ tiles.forEach(tile => {
     // Provide data for HTML5 DnD and test frameworks
     if (e.dataTransfer) {
       e.dataTransfer.setData('text/plain', dragSourceId);
-      // e.dataTransfer.setDragImage(e.currentTarget, 10, 10); // optional
+      // Optional: customize drag image if desired
+      // e.dataTransfer.setDragImage(e.currentTarget, 10, 10);
     }
   });
 
