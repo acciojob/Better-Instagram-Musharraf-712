@@ -7,11 +7,11 @@ const tiles = document.querySelectorAll('#parent .image');
 // Track the source being dragged
 let dragSourceId = null;
 
+// Helpers to read/set background-image reliably
 function getBg(el) {
-  // Computed style returns values like: url("...") or none
+  // Returns values like: url("...") or none
   return getComputedStyle(el).backgroundImage;
 }
-
 function setBg(el, value) {
   el.style.backgroundImage = value;
 }
@@ -22,11 +22,9 @@ tiles.forEach(tile => {
     e.currentTarget.classList.add('selected');
 
     // Provide data for HTML5 DnD and test frameworks
-    // Use source id so the drop handler can find the origin
     if (e.dataTransfer) {
       e.dataTransfer.setData('text/plain', dragSourceId);
-      // Optional: customize drag image if desired
-      // e.dataTransfer.setDragImage(e.currentTarget, 10, 10);
+      // e.dataTransfer.setDragImage(e.currentTarget, 10, 10); // optional
     }
   });
 
@@ -36,9 +34,9 @@ tiles.forEach(tile => {
     dragSourceId = null;
   });
 
-  // Allow dropping
+  // Must prevent default to allow dropping per spec
   tile.addEventListener('dragover', (e) => {
-    e.preventDefault(); // required by spec to enable drop
+    e.preventDefault();
   });
 
   tile.addEventListener('dragenter', (e) => {
@@ -56,15 +54,14 @@ tiles.forEach(tile => {
 
     const target = e.currentTarget;
 
-    // Retrieve the source id from DataTransfer, fall back to in-memory
+    // Retrieve the source id stored during dragstart
     const sourceId = (e.dataTransfer && e.dataTransfer.getData('text/plain')) || dragSourceId;
-    if (!sourceId) return;
-    if (sourceId === target.id) return; // no-op when dropping on itself
+    if (!sourceId || sourceId === target.id) return;
 
     const sourceEl = document.getElementById(sourceId);
     if (!sourceEl) return;
-div4
-    // Swap background images between the two divs
+
+    // Swap background images
     const srcBg = getBg(sourceEl);
     const tgtBg = getBg(target);
 
