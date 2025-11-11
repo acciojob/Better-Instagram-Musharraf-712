@@ -20,8 +20,14 @@ divs.forEach((div) =>{
 		delt.preventDefault();
 		if(dragged === delt.target) return;
 
-		const temp = dragged.style.backgroundImage;
-		dragged.style.backgroundImage = delt.target.style.backgroundImage;
-		delt.target.style.backgroundImage = temp
+		// const temp = dragged.style.backgroundImage;
+		// dragged.style.backgroundImage = delt.target.style.backgroundImage;
+		// delt.target.style.backgroundImage = temp
+
+		const draggedBg = window.getComputedStyle(dragged).backgroundImage;
+		const targetBg = window.getCompputedStyle(e.target).backgroundImage;
+
+		dragged.style.backgroundImage = targetBg;
+		e.target.style.backgroundImage = graggedBg;
 	})
 })
