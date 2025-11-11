@@ -3,7 +3,7 @@ const divs = document.querySelectorAll('#parent div');
 let dragged = null;
 
 divs.forEach((div) =>{
-	div.addEventListener('dragstsrt', (e) => {
+	divs.addEventListener('dragstart', (e) => {
 		dragged = e.target;
 		e.target.classList.add('selected');
 	})
@@ -20,7 +20,7 @@ divs.forEach((div) =>{
 		delt.preventDefault();
 		if(dragged === delt.target) return;
 
-		const temp = dragged.style.bckgroundImage;
+		const temp = dragged.style.backgroundImage;
 		dragged.style.backgroundImage = delt.target.style.backgroundImage;
 		delt.target.style.backgroundImage = temp
 	})
