@@ -1,8 +1,8 @@
-// Drag-and-drop that swaps the entire tiles (DOM nodes), not just images.
-// Works with your existing HTML/CSS (ids drag1..drag6, class "image").
+// Drag-and-drop that swaps entire tiles (DOM nodes), not just background images.
+// Works with your existing HTML/CSS (ids drag1..drag6, class "image") and a single parent #parent.
 
-const tiles = document.querySelectorAll('#parent .image');
 const parent = document.getElementById('parent');
+const tiles = document.querySelectorAll('#parent .image');
 
 let dragSourceId = null;
 
@@ -12,9 +12,10 @@ tiles.forEach(tile => {
     e.currentTarget.classList.add('selected');
 
     if (e.dataTransfer) {
-      // identify the source element by id for the drop handler
+      // Identify the source element by id for the drop handler
       e.dataTransfer.setData('text/plain', dragSourceId);
-      // optionally: e.dataTransfer.effectAllowed = 'move';
+      // Indicate move semantics (optional but clear)
+      e.dataTransfer.effectAllowed = 'move';
     }
   });
 
@@ -24,10 +25,10 @@ tiles.forEach(tile => {
     dragSourceId = null;
   });
 
-  // Required so drop will fire
+  // Required so the drop event will fire on valid targets
   tile.addEventListener('dragover', (e) => {
     e.preventDefault();
-    // optionally: e.dataTransfer.dropEffect = 'move';
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
   });
 
   tile.addEventListener('dragenter', (e) => {
@@ -45,23 +46,23 @@ tiles.forEach(tile => {
 
     const target = e.currentTarget;
     const sourceId = (e.dataTransfer && e.dataTransfer.getData('text/plain')) || dragSourceId;
+
     if (!sourceId || sourceId === target.id) return;
 
     const sourceEl = document.getElementById(sourceId);
     if (!sourceEl || !sourceEl.parentNode || !target.parentNode) return;
 
-    // Swap the two nodes in the DOM
-    // Technique: insert a temporary placeholder, then move nodes around it.
+    // Swap the two nodes in the DOM using a placeholder technique
     const placeholder = document.createElement('div');
     placeholder.style.display = 'none';
 
     const sourceParent = sourceEl.parentNode;
     const targetParent = target.parentNode;
 
-    // Insert placeholder where the source is
+    // Insert placeholder where sourceEl is
     sourceParent.insertBefore(placeholder, sourceEl);
 
-    // Move source to target's position
+    // Move sourceEl to target's position
     targetParent.insertBefore(sourceEl, target);
 
     // Move target to placeholder's original position
