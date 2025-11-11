@@ -3,7 +3,7 @@ const divs = document.querySelectorAll('#parent div');
 let dragged = null;
 
 divs.forEach((div) =>{
-	divs.addEventListener('dragstart', (e) => {
+	div.addEventListener('dragstart', (e) => {
 		dragged = e.target;
 		e.target.classList.add('selected');
 	})
